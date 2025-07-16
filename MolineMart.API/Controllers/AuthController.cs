@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using MolineMart.API.Helper;
 using MolineMart.API.Models;
 using MolineMart.API.Services;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 
 namespace MolineMart.API.Controllers
@@ -60,6 +62,25 @@ namespace MolineMart.API.Controllers
             var result = await _userManager.ConfirmEmailAsync(user, token);
             return result.Succeeded ? Ok("Email confirmed") : BadRequest("Invalid token");
 
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) 
+            return Unauthorized("Invalid credentials");
+
+
+            if (!await _userManager.IsEmailConfirmedAsync(user)) 
+                return Unauthorized("Email not confirmed");
+
+            var role = await _userManager.GetRolesAsync(user);
+            var token = JwtHelper.GenerateJwtToken(user, _configuration,role);
+
+            return Ok(new { token });
         }
     }
 }
