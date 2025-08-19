@@ -13,7 +13,8 @@ namespace MolineMart.API.Helper
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id),
-                new(ClaimTypes.Email, user.Email)
+                new(ClaimTypes.Email, user.Email),
+                new Claim("FullName", user.FullName ?? ""), // <-- Add this line
             };
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.NameIdentifier, role)));
 

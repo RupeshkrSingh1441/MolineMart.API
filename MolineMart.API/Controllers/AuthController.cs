@@ -16,9 +16,9 @@ namespace MolineMart.API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
-        private readonly EmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration, EmailSender emailSender)
+            IConfiguration configuration, IEmailSender emailSender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -31,56 +31,81 @@ namespace MolineMart.API.Controllers
         {
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = model.FullName };
             var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
+            try
             {
+                if (result.Succeeded)
+                {
 
-                if (!await _roleManager.RoleExistsAsync("User"))
-                    await _roleManager.CreateAsync(new IdentityRole("User"));
+                    if (!await _roleManager.RoleExistsAsync("User"))
+                        await _roleManager.CreateAsync(new IdentityRole("User"));
 
-                await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, "User");
 
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmationLink = Url.Action(nameof(ConfirmEmail), "Auth",
-                    new { userId = user.Id, token = WebUtility.UrlEncode(token) }, Request.Scheme);
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmationLink = Url.Action(nameof(ConfirmEmail), "Auth",
+                        new { userId = user.Id, token = WebUtility.UrlEncode(token) }, Request.Scheme);
 
-                await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-                    $"Please <a href='{confirmationLink}'>click here</a> to confirm your email.");
+                    await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                        $"Please <a href='{confirmationLink}'>click here</a> to confirm your email.");
 
-                return Ok("Registration successful! Please check your email to confirm your account.");
+                    return Ok("Registration successful! Please check your email to confirm your account.");
+                }
+
+                return BadRequest(result.Errors);
             }
-
-            return BadRequest(result.Errors);
+            catch (Exception ex)
+            {
+                var message = ex.StackTrace;
+                return BadRequest(result.Errors);
+            }
         }
 
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return BadRequest("User not found");
+            var result = new IdentityResult();
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null) return BadRequest("User not found");
 
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            return result.Succeeded ? Ok("Email confirmed") : BadRequest("Invalid token");
+                var decodeToken = WebUtility.UrlDecode(token);
+                result = await _userManager.ConfirmEmailAsync(user, decodeToken);
+                return result.Succeeded ? Ok("Email confirmed") : BadRequest("Invalid token");
+            }
+            catch (Exception ex)
+            {
+                var message = ex.StackTrace;
+                return BadRequest(result.Errors);
+            }
 
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
 
 
-            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) 
-            return Unauthorized("Invalid credentials");
+                if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+                    return Unauthorized("Invalid credentials");
 
 
-            if (!await _userManager.IsEmailConfirmedAsync(user)) 
-                return Unauthorized("Email not confirmed");
+                if (!await _userManager.IsEmailConfirmedAsync(user))
+                    return Unauthorized("Email not confirmed");
 
-            var role = await _userManager.GetRolesAsync(user);
-            var token = JwtHelper.GenerateJwtToken(user, _configuration,role);
+                var role = await _userManager.GetRolesAsync(user);
+                var token = JwtHelper.GenerateJwtToken(user, _configuration, role);
 
-            return Ok(new { token });
+                return Ok(new { token });
+            }
+            catch (Exception ex)
+            {
+                var message = ex.StackTrace;
+                return BadRequest();
+            }
         }
     }
 }

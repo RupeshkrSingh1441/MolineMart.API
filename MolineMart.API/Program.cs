@@ -17,8 +17,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Identity
+builder.Services.AddDataProtection();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -44,13 +46,22 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IEmailSender, EmailSender>(); // EmailSender : IEmailSender
 
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy.WithOrigins("http://localhost:3000")
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+});
+
+//var test = new EmailSender();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -65,7 +76,11 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedAdmin(scope.ServiceProvider);
 }
 
-    app.UseHttpsRedirection();
+app.UseCors("AllowReactApp");
+app.UseHttpsRedirection();
+
+// Enable serving static files from wwwroot
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

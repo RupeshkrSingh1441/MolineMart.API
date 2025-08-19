@@ -10,8 +10,8 @@ namespace MolineMart.API.Helper
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            string adminEmail = "rs.rupesh105@gmail.com";
-            string password = "Admin@123";
+            string adminEmail = "rs.rupesh105@gmail.com";//rs.rupesh105@gmail.com
+            string password = "Admin@123"; //Admin@123
 
             if (!await roleManager.RoleExistsAsync("Admin"))
                 await roleManager.CreateAsync(new IdentityRole("Admin"));
