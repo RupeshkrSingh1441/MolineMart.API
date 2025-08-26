@@ -4,5 +4,6 @@
     {
         public decimal Amount { get; set; } // Amount in INR
         public string ReceiptId { get; set; } // Optional receipt ID for the order
+        public string Email { get; set; } 
     }
 }

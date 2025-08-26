@@ -22,6 +22,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -47,6 +48,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEmailSender, EmailSender>(); // EmailSender : IEmailSender
+builder.Services.AddScoped<RazorpayService>();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -55,10 +57,13 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
+    options.AddPolicy("AllowAll",
         policy => policy.WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
         .AllowAnyHeader());
+    //b => b.AllowAnyOrigin()
+    //.AllowAnyMethod()
+    //.AllowAnyHeader());
 });
 
 //var test = new EmailSender();
@@ -76,7 +81,7 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedAdmin(scope.ServiceProvider);
 }
 
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 // Enable serving static files from wwwroot
