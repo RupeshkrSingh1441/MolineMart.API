@@ -1,4 +1,5 @@
-﻿namespace MolineMart.API.Models
+﻿
+namespace MolineMart.API.Models
 {
     public class Order
     {
@@ -10,5 +11,8 @@
         public decimal Amount { get; set; }
         public string Email { get; set; }
         public string Status { get; set; } ="Pending"; // Default status is Pending
+
+        public ICollection<OrderItem> Items { get; set; }
+        public Payment Payment { get; set; }
     }
 }

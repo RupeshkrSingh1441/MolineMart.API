@@ -15,8 +15,9 @@ namespace MolineMart.API.Helper
                 new(ClaimTypes.NameIdentifier, user.Id),
                 new(ClaimTypes.Email, user.Email),
                 new Claim("FullName", user.FullName ?? ""), // <-- Add this line
+                new Claim("roles", string.Join(",",roles))
             };
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.NameIdentifier, role)));
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var creds = new SigningCredentials(key,SecurityAlgorithms.HmacSha256);

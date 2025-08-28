@@ -6,8 +6,9 @@ using MolineMart.API.Data;
 
 namespace MolineMart.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    
     public class OrderController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +19,7 @@ namespace MolineMart.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost("all-orders")]
+        [HttpGet("all-orders")]
         public async Task<IActionResult> GetAllOrders()
         {
             // Implementation for fetching orders goes here

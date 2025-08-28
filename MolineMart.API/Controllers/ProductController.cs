@@ -8,8 +8,8 @@ namespace MolineMart.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles ="Admin")]
-    [Authorize(Policy ="AdminOnly")]
+    [Authorize(Roles ="Admin")]
+    //[Authorize(Policy ="AdminOnly")]
     public class ProductController :ControllerBase
     {
         private readonly ApplicationDbContext _context;

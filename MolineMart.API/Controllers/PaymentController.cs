@@ -14,7 +14,7 @@ namespace MolineMart.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    
+
     public class PaymentController : ControllerBase
     {
         private readonly RazorpayService _razorpayService;
@@ -22,7 +22,7 @@ namespace MolineMart.API.Controllers
         private readonly ApplicationDbContext _context; // Add this field to inject the DbContext
         private readonly IEmailSender _emailSender; // Add this field to inject the EmailSender service
 
-        public PaymentController(RazorpayService razorpayService,IConfiguration config, ApplicationDbContext context,IEmailSender emailSender)
+        public PaymentController(RazorpayService razorpayService, IConfiguration config, ApplicationDbContext context, IEmailSender emailSender)
         {
             _razorpayService = razorpayService;
             _config = config;
@@ -54,15 +54,34 @@ namespace MolineMart.API.Controllers
                 Status = "Pending"
             };
 
+            var ids = request.Lines.Select(l => l.ProductId).ToList();
+            var products = await _context.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
+
+            foreach (var line in request.Lines)
+            {
+                var product = products.FirstOrDefault(p => p.Id == line.ProductId);
+                if (product != null)
+                {
+                    dbOrder.Items ??= new List<OrderItem>();
+                    dbOrder.Items.Add(new OrderItem
+                    {
+                        ProductId = product.Id,
+                        Product = product,
+                        Quantity = line.Quantity,
+                        Price = product.Price
+                    });
+                }
+            }
+
             _context.Orders.Add(dbOrder);
             await _context.SaveChangesAsync();
 
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 key = _config["Razorpay:Key"],
-                OrderId = order["id"].ToString(), 
+                OrderId = order["id"].ToString(),
                 Amount = order["amount"].ToString(),
-                Currency = "INR" 
+                Currency = "INR"
             });
         }
 
@@ -108,25 +127,43 @@ namespace MolineMart.API.Controllers
             var orderId = entity.GetProperty("order_id").GetString();
             var status = entity.GetProperty("status").GetString();
 
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.RazorpayOrderId == orderId);
-            if (order != null)
+            var order = await _context.Orders.Include(o => o.Payment).FirstOrDefaultAsync(o => o.RazorpayOrderId == orderId);
+
+            if (order == null) return NotFound("Order not found.");
+
+            if (status == "captured")
             {
                 order.RazorpayPaymentId = paymentId;
-                order.Status = status;
+                order.Status = "Paid";
+                if (order.Payment == null)
+                {
+                    order.Payment = new Payment
+                    {
+                        RazorpayPaymentId = paymentId,
+                        Order = order,
+                        RazorpayOrderId = orderId,
+                        RazorpaySignature = signature,
+                        Status = status,
+                       // AmountPaise = order.Amount
+                    };
+                }
+                else
+                {
+                    order.Payment.Status = order.Status;
+                    order.Payment.CreatedAt = DateTime.UtcNow;
+                }
                 _context.Orders.Update(order);
                 await _context.SaveChangesAsync();
 
-                if (status == "captured")
-                {
-                    // Handle successful payment logic here, e.g., update order status, notify user, etc.
-                    await _emailSender.SendWebhookEmailAsync(order.Email, "Payment Successful", 
-                        $"<h3>Thank you for your purchase!</h3><p>Order ID: {order.RazorpayOrderId}</p><p>Amount: ₹{order.Amount}</p>");
-                }
+                // Handle successful payment logic here, e.g., update order status, notify user, etc.
+                await _emailSender.SendWebhookEmailAsync(order.Email, "Payment Successful",
+                    $"<h3>Thank you for your purchase!</h3><p>Order ID: {order.RazorpayOrderId}</p><p>Amount: ₹{order.Amount}</p>");
             }
-            else
+            else if(status == "failed")
             {
-                // Log or handle the case where the order is not found
-                return NotFound("Order not found.");
+               order.Status = "Failed";
+                _context.Orders.Update(order);
+                await _context.SaveChangesAsync();
             }
 
             return Ok(new { Message = "Webhook received successfully.", PaymentId = paymentId });
