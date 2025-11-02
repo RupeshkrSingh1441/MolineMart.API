@@ -18,7 +18,7 @@ namespace MolineMart.API.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("all-orders")]
         public async Task<IActionResult> GetAllOrders()
         {

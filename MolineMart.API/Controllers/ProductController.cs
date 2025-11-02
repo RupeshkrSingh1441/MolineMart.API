@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MolineMart.API.Data;
+using MolineMart.API.Dto;
 using MolineMart.API.Models;
 
 namespace MolineMart.API.Controllers
@@ -32,13 +33,41 @@ namespace MolineMart.API.Controllers
         }
 
 
+        //[HttpPost]
+        //public async Task<IActionResult> Create([FromBody] Product product)
+        //{
+        //    _context.Products.Add(product);
+        //    await _context.SaveChangesAsync();
+        //    return CreatedAtAction(nameof(Get), new {id = product.Id}, product);
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<IActionResult> AddProduct([FromForm] ProductCreateDto productDto)
         {
+            if (productDto.Image == null || productDto.Image.Length == 0)
+                return BadRequest("Image is required.");
+
+            var filePath = Path.Combine("wwwroot/images", productDto.Image.FileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await productDto.Image.CopyToAsync(stream);
+            }
+
+            var product = new Product
+            {
+                Brand = productDto.Brand,
+                Model = productDto.Model,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                ImageUrl = $"/images/{productDto.Image.FileName}"
+            };
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new {id = product.Id}, product);
+
+            return Ok(new { message = "Product added successfully", product });
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Product product)
