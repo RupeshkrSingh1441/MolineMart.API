@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MolineMart.API.Data;
 
@@ -11,9 +12,11 @@ using MolineMart.API.Data;
 namespace MolineMart.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251111104143_SeedMoreDataIntoNewlyCreatedTabled")]
+    partial class SeedMoreDataIntoNewlyCreatedTabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,7 +234,7 @@ namespace MolineMart.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EstimatedDays")
+                    b.Property<int?>("EstimatedDays")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAvailable")
@@ -262,7 +265,6 @@ namespace MolineMart.API.Migrations
                         new
                         {
                             Id = 3,
-                            EstimatedDays = 2,
                             IsAvailable = false,
                             Pincode = "560001"
                         });
@@ -594,7 +596,7 @@ namespace MolineMart.API.Migrations
                             Id = 1,
                             ProductId = 1,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4528),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2328),
                             ReviewText = "Great phone!",
                             UserName = "Amit Sharma"
                         },
@@ -603,7 +605,7 @@ namespace MolineMart.API.Migrations
                             Id = 2,
                             ProductId = 1,
                             Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4532),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2335),
                             ReviewText = "Excellent but expensive.",
                             UserName = "Neha Gupta"
                         },
@@ -612,7 +614,7 @@ namespace MolineMart.API.Migrations
                             Id = 3,
                             ProductId = 2,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4534),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2336),
                             ReviewText = "S Pen is absolutely amazing.",
                             UserName = "Rahul Verma"
                         },
@@ -621,7 +623,7 @@ namespace MolineMart.API.Migrations
                             Id = 4,
                             ProductId = 2,
                             Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4535),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2339),
                             ReviewText = "Battery life could be better.",
                             UserName = "Priya Singh"
                         },
@@ -630,7 +632,7 @@ namespace MolineMart.API.Migrations
                             Id = 5,
                             ProductId = 3,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4535),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2340),
                             ReviewText = "Fast performance and super smooth UI.",
                             UserName = "Karan Malik"
                         },
@@ -639,7 +641,7 @@ namespace MolineMart.API.Migrations
                             Id = 6,
                             ProductId = 4,
                             Rating = 3,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4536),
+                            ReviewDate = new DateTime(2025, 11, 11, 10, 41, 43, 42, DateTimeKind.Utc).AddTicks(2341),
                             ReviewText = "Great software experience – clean and intuitive.",
                             UserName = "Anil Kumar"
                         });

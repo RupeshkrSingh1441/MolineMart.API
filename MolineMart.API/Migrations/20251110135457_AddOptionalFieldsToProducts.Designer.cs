@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MolineMart.API.Data;
 
@@ -11,9 +12,11 @@ using MolineMart.API.Data;
 namespace MolineMart.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110135457_AddOptionalFieldsToProducts")]
+    partial class AddOptionalFieldsToProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,51 +226,6 @@ namespace MolineMart.API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("MolineMart.API.Models.DeliveryAvailability", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EstimatedDays")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Pincode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DeliveryAvailability");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EstimatedDays = 2,
-                            IsAvailable = true,
-                            Pincode = "110001"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EstimatedDays = 3,
-                            IsAvailable = true,
-                            Pincode = "400001"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EstimatedDays = 2,
-                            IsAvailable = false,
-                            Pincode = "560001"
-                        });
-                });
-
             modelBuilder.Entity("MolineMart.API.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -416,282 +374,6 @@ namespace MolineMart.API.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("MolineMart.API.Models.ProductFeature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FeatureDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FeatureTitle")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductFeatures");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FeatureDescription = "A16 Bionic Chip",
-                            FeatureTitle = "Processor",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FeatureDescription = "6.1-inch Super Retina XDR Display",
-                            FeatureTitle = "Display",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FeatureDescription = "48MP main camera with cinematic mode",
-                            FeatureTitle = "Camera",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FeatureDescription = "Up to 24 hours video playback",
-                            FeatureTitle = "Battery",
-                            ProductId = 1
-                        });
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.ProductImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImages");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ImageUrl = "/images/iphone14pro_front.jpg",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ImageUrl = "/images/iphone14pro_back.jpg",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ImageUrl = "/images/iphone14pro_side.jpg",
-                            ProductId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ImageUrl = "/images/galaxys23ultra_front.jpg",
-                            ProductId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ImageUrl = "/images/galaxys23ultra_back.jpg",
-                            ProductId = 2
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ImageUrl = "/images/galaxys23ultra_side.jpg",
-                            ProductId = 2
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ImageUrl = "/images/oneplus11r_front.jpg",
-                            ProductId = 3
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ImageUrl = "/images/oneplus11r_back.jpg",
-                            ProductId = 3
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ImageUrl = "/images/pixel8_front.jpg",
-                            ProductId = 4
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ImageUrl = "/images/pixel8_back.jpg",
-                            ProductId = 4
-                        },
-                        new
-                        {
-                            Id = 11,
-                            ImageUrl = "/images/pixel8_side.jpg",
-                            ProductId = 4
-                        });
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.ProductReview", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReviewDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReviewText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductReviews");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ProductId = 1,
-                            Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4528),
-                            ReviewText = "Great phone!",
-                            UserName = "Amit Sharma"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ProductId = 1,
-                            Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4532),
-                            ReviewText = "Excellent but expensive.",
-                            UserName = "Neha Gupta"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ProductId = 2,
-                            Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4534),
-                            ReviewText = "S Pen is absolutely amazing.",
-                            UserName = "Rahul Verma"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ProductId = 2,
-                            Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4535),
-                            ReviewText = "Battery life could be better.",
-                            UserName = "Priya Singh"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ProductId = 3,
-                            Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4535),
-                            ReviewText = "Fast performance and super smooth UI.",
-                            UserName = "Karan Malik"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ProductId = 4,
-                            Rating = 3,
-                            ReviewDate = new DateTime(2025, 11, 11, 11, 28, 10, 752, DateTimeKind.Utc).AddTicks(4536),
-                            ReviewText = "Great software experience – clean and intuitive.",
-                            UserName = "Anil Kumar"
-                        });
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.RelatedProduct", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RelatedProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("RelatedProducts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ProductId = 1,
-                            RelatedProductId = 3
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ProductId = 1,
-                            RelatedProductId = 4
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ProductId = 2,
-                            RelatedProductId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ProductId = 2,
-                            RelatedProductId = 5
-                        });
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -780,50 +462,6 @@ namespace MolineMart.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.ProductFeature", b =>
-                {
-                    b.HasOne("MolineMart.API.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.ProductImage", b =>
-                {
-                    b.HasOne("MolineMart.API.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.ProductReview", b =>
-                {
-                    b.HasOne("MolineMart.API.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("MolineMart.API.Models.RelatedProduct", b =>
-                {
-                    b.HasOne("MolineMart.API.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("MolineMart.API.Models.Order", b =>
