@@ -6,6 +6,9 @@ namespace MolineMart.API.Models
         public int Id { get; set; }
         public string RazorpayOrderId { get; set; }
         public string RazorpayPaymentId { get; set; }
+
+        // Foreign Key
+        public string UserId { get; set; }
         public ApplicationUser User { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow; // Default to current UTC time
         public decimal Amount { get; set; }

@@ -67,6 +67,7 @@ namespace MolineMart.API.Data
                 new DeliveryAvailability { Id = 2, Pincode = "400001", IsAvailable = true, EstimatedDays = 3 },
                 new DeliveryAvailability { Id = 3, Pincode = "560001", IsAvailable = false, EstimatedDays = 2 }
             );
+
         }
     }
 }

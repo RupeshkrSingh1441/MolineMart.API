@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using MolineMart.API.Helper;
@@ -6,6 +7,7 @@ using MolineMart.API.Models;
 using MolineMart.API.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 
 namespace MolineMart.API.Controllers
 {
@@ -106,6 +108,35 @@ namespace MolineMart.API.Controllers
                 var message = ex.StackTrace;
                 return BadRequest();
             }
+        }
+
+        
+        [HttpGet("profile")]
+        [Authorize]
+        public async Task<IActionResult> GetProfile()
+        {
+            // NameIdentifier is the user id stored in the JWT (usually)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return Ok(new
+            {
+                id = user.Id,
+                fullName = user.FullName,
+                email = user.Email,
+                phonNumber=user.PhoneNumber,
+                AddressLine1=user.AddressLine1,
+                AddressLine2 =user.AddressLine2,
+                City =user.City,
+                State =user.State,
+                Country =user.Country,
+                ZipCode = user.ZipCode
+            });
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MolineMart.API.Data;
 
@@ -11,9 +12,11 @@ using MolineMart.API.Data;
 namespace MolineMart.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113151607_AddUserIdToOrder")]
+    partial class AddUserIdToOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,20 +166,8 @@ namespace MolineMart.API.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("AddressLine1")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -215,18 +206,12 @@ namespace MolineMart.API.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("State")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("ZipCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -612,7 +597,7 @@ namespace MolineMart.API.Migrations
                             Id = 1,
                             ProductId = 1,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3351),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5926),
                             ReviewText = "Great phone!",
                             UserName = "Amit Sharma"
                         },
@@ -621,7 +606,7 @@ namespace MolineMart.API.Migrations
                             Id = 2,
                             ProductId = 1,
                             Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3364),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5937),
                             ReviewText = "Excellent but expensive.",
                             UserName = "Neha Gupta"
                         },
@@ -630,7 +615,7 @@ namespace MolineMart.API.Migrations
                             Id = 3,
                             ProductId = 2,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3366),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5939),
                             ReviewText = "S Pen is absolutely amazing.",
                             UserName = "Rahul Verma"
                         },
@@ -639,7 +624,7 @@ namespace MolineMart.API.Migrations
                             Id = 4,
                             ProductId = 2,
                             Rating = 4,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3367),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5941),
                             ReviewText = "Battery life could be better.",
                             UserName = "Priya Singh"
                         },
@@ -648,7 +633,7 @@ namespace MolineMart.API.Migrations
                             Id = 5,
                             ProductId = 3,
                             Rating = 5,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3368),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5943),
                             ReviewText = "Fast performance and super smooth UI.",
                             UserName = "Karan Malik"
                         },
@@ -657,7 +642,7 @@ namespace MolineMart.API.Migrations
                             Id = 6,
                             ProductId = 4,
                             Rating = 3,
-                            ReviewDate = new DateTime(2025, 11, 15, 11, 10, 36, 311, DateTimeKind.Utc).AddTicks(3369),
+                            ReviewDate = new DateTime(2025, 11, 13, 15, 16, 6, 391, DateTimeKind.Utc).AddTicks(5944),
                             ReviewText = "Great software experience – clean and intuitive.",
                             UserName = "Anil Kumar"
                         });
