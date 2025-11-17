@@ -31,7 +31,19 @@ namespace MolineMart.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FullName = model.FullName };
+            var user = new ApplicationUser 
+            { 
+                UserName = model.Email, 
+                Email = model.Email, 
+                FullName = model.FullName,
+
+                AddressLine1 = model.AddressLine1,
+                AddressLine2 = model.AddressLine2,
+                City = model.City,
+                State = model.State,
+                Country = model.Country,
+                ZipCode = model.ZipCode
+            };
             var result = await _userManager.CreateAsync(user, model.Password);
             try
             {
