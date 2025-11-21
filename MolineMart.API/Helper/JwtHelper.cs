@@ -26,7 +26,7 @@ namespace MolineMart.API.Helper
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: claims,
-                expires:DateTime.Now.AddDays(7),
+                expires:DateTime.UtcNow.AddMinutes(2),
                 signingCredentials:creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

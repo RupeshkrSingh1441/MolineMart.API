@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using MolineMart.API.Dto;
 using MolineMart.API.Helper;
 using MolineMart.API.Models;
 using MolineMart.API.Services;
@@ -112,6 +113,7 @@ namespace MolineMart.API.Controllers
 
                 var role = await _userManager.GetRolesAsync(user);
                 var token = JwtHelper.GenerateJwtToken(user, _configuration, role);
+                //Expires = DateTime.UtcNow.AddMinutes(2);
 
                 return Ok(new { token });
             }
@@ -121,7 +123,6 @@ namespace MolineMart.API.Controllers
                 return BadRequest();
             }
         }
-
         
         [HttpGet("profile")]
         [Authorize]
@@ -150,5 +151,28 @@ namespace MolineMart.API.Controllers
                 ZipCode = user.ZipCode
             });
         }
+
+        [Authorize]
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return NotFound();
+
+            user.FullName = dto.FullName;
+            user.AddressLine1 = dto.AddressLine1;
+            user.City = dto.City;
+            user.State = dto.State;
+            user.Country = dto.Country;
+            user.ZipCode = dto.ZipCode;
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { message = "Profile updated successfully" });
+        }
+
     }
 }
