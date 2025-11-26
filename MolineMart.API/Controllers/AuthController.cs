@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.EntityFrameworkCore;
+using MolineMart.API.Data;
 using MolineMart.API.Dto;
 using MolineMart.API.Helper;
 using MolineMart.API.Models;
@@ -20,13 +23,15 @@ namespace MolineMart.API.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
         public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration, IEmailSender emailSender)
+            IConfiguration configuration, IEmailSender emailSender,ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -112,10 +117,26 @@ namespace MolineMart.API.Controllers
                     return Unauthorized("Email not confirmed");
 
                 var role = await _userManager.GetRolesAsync(user);
-                var token = JwtHelper.GenerateJwtToken(user, _configuration, role);
-                //Expires = DateTime.UtcNow.AddMinutes(2);
+                var accessToken = JwtHelper.GenerateJwtToken(user, _configuration, role);
+                var refreshToken = JwtHelper.GenerateRefreshToken();
 
-                return Ok(new { token });
+                // Save refresh token
+                var refreshEntity = new RefreshToken
+                {
+                    Token = refreshToken,
+                    UserId = user.Id,
+                    Expires = DateTime.UtcNow.AddDays(7)
+                };
+
+                _context.RefreshTokens.Add(refreshEntity);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    accessToken,
+                    refreshToken,
+                    user = new { user.FullName, user.Email }
+                });
             }
             catch (Exception ex)
             {
@@ -148,7 +169,8 @@ namespace MolineMart.API.Controllers
                 City =user.City,
                 State =user.State,
                 Country =user.Country,
-                ZipCode = user.ZipCode
+                ZipCode = user.ZipCode,
+                role = roles
             });
         }
 
@@ -174,5 +196,38 @@ namespace MolineMart.API.Controllers
             return Ok(new { message = "Profile updated successfully" });
         }
 
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshRequestDto dto)
+        {
+            var refresh = await _context.RefreshTokens
+                .FirstOrDefaultAsync(x => x.Token == dto.RefreshToken);
+
+            if (refresh == null || !refresh.IsActive)
+                return Unauthorized(new { message = "Invalid refresh token" });
+
+            var user = await _userManager.FindByIdAsync(refresh.UserId);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // rotate token
+            refresh.Revoked = DateTime.UtcNow;
+
+            var newRefreshToken = new RefreshToken
+            {
+                Token = JwtHelper.GenerateRefreshToken(),
+                UserId = user.Id,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+
+            _context.RefreshTokens.Add(newRefreshToken);
+            await _context.SaveChangesAsync();
+
+            var newAccessToken = JwtHelper.GenerateJwtToken(user, _configuration, roles);
+
+            return Ok(new
+            {
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken.Token
+            });
+        }
     }
 }

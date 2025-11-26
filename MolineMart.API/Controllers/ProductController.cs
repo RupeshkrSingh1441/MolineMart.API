@@ -161,5 +161,47 @@ namespace MolineMart.API.Controllers
             var urlPath = $"/images/{fileName}";
             return Ok(new { imageUrl = urlPath });
         }
+
+        // GET: api/product/search-suggestions?q=iphone
+        [HttpGet("search-suggestions")]
+        public async Task<IActionResult> GetSuggestions([FromQuery] string q)
+        {
+            if (string.IsNullOrWhiteSpace(q))
+                return Ok(new List<string>());
+
+            q = q.ToLower();
+
+            var suggestions = await _context.Products
+                .Where(p => p.Brand.ToLower().Contains(q)
+                         || p.Model.ToLower().Contains(q))
+                .Select(p => new
+                {
+                    id = p.Id,
+                    name = p.Brand + " " + p.Model,
+                    image = p.ImageUrl
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Ok(suggestions);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] string q)
+        {
+            if (string.IsNullOrWhiteSpace(q))
+                return Ok(new List<Product>());
+
+            q = q.ToLower();
+
+            var list = await _context.Products
+                .Where(p => p.Brand.ToLower().Contains(q)
+                         || p.Model.ToLower().Contains(q)
+                         || p.Description.ToLower().Contains(q))
+                .ToListAsync();
+
+            return Ok(list);
+        }
+
     }
 }

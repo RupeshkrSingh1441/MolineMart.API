@@ -19,6 +19,8 @@ namespace MolineMart.API.Data
         public DbSet<ProductFeature> ProductFeatures { get; set; }
         public DbSet<RelatedProduct> RelatedProducts { get; set; }
         public DbSet<DeliveryAvailability> DeliveryAvailability { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

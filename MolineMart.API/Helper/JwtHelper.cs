@@ -2,6 +2,7 @@
 using MolineMart.API.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MolineMart.API.Helper
@@ -26,10 +27,15 @@ namespace MolineMart.API.Helper
                 issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: claims,
-                expires:DateTime.UtcNow.AddMinutes(2),
+                expires:DateTime.UtcNow.AddMinutes(15),//Access token valid for 15 minutes
                 signingCredentials:creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public static string GenerateRefreshToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
     }
 }
