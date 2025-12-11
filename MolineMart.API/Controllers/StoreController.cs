@@ -20,33 +20,73 @@ namespace MolineMart.API.Controllers
         }
 
         [HttpGet("products")]
-        public async Task<ActionResult<IEnumerable<Models.Product>>> GetAll([FromQuery] ProductFilterDto filter)
+        public async Task<IActionResult> GetProducts(
+        [FromQuery] string q,
+        [FromQuery] string brand,
+        [FromQuery] string category,
+        [FromQuery] decimal? minPrice,
+        [FromQuery] decimal? maxPrice,
+        [FromQuery] string sort,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 12)
         {
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 12;
 
-            var products = _context.Products.AsQueryable();
+            var query = _context.Products.AsQueryable();
 
-            if (!string.IsNullOrEmpty(filter.Search))
-                products = products.Where(p => p.Brand.Contains(filter.Search));
-
-            if (!string.IsNullOrEmpty(filter.Brand))
-                products = products.Where(p => p.Brand.Contains(filter.Brand));
-
-            if (!string.IsNullOrEmpty(filter.Category))
-                products = products.Where(p => p.Model.Contains(filter.Category));
-
-
-
-            foreach (var product in products)
+            if (!string.IsNullOrWhiteSpace(q))
             {
-                if (!string.IsNullOrEmpty(product.ImageUrl))
-                {
-                    var fileName = Path.GetFileName(product.ImageUrl);
-                    product.ImageUrl = $"{Request.Scheme}://{Request.Host}/images/{fileName}";
-                }
+                var lower = q.Trim().ToLower();
+                query = query.Where(p =>
+                    p.Model.ToLower().Contains(lower) ||
+                    p.Brand.ToLower().Contains(lower) ||
+                    p.Description.ToLower().Contains(lower));
             }
 
-            var result = await products.ToListAsync();
-            return Ok(result);
+            if (!string.IsNullOrWhiteSpace(brand))
+                query = query.Where(p => p.Brand == brand);
+
+            if (!string.IsNullOrWhiteSpace(category))
+                query = query.Where(p => p.Category == category);
+
+            if (minPrice.HasValue)
+                query = query.Where(p => p.Price >= minPrice.Value);
+
+            if (maxPrice.HasValue)
+                query = query.Where(p => p.Price <= maxPrice.Value);
+
+            // sorting
+            query = sort switch
+            {
+                "price_asc" => query.OrderBy(p => p.Price),
+                "price_desc" => query.OrderByDescending(p => p.Price),
+                "newest" => query.OrderByDescending(p => p.Id), // or CreatedDate
+                _ => query.OrderBy(p => p.Brand).ThenBy(p => p.Model)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new {
+                    id = p.Id,
+                    brand = p.Brand,
+                    model = p.Model,
+                    price = p.Price,
+                    imageUrl = p.ImageUrl,
+                    category = p.Category,
+                    description = p.Description
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                total = totalCount,
+                page,
+                pageSize,
+                items
+            });
         }
 
         [HttpGet("product-full/{id}")]
@@ -189,7 +229,18 @@ namespace MolineMart.API.Controllers
             });
         }
 
+        [HttpGet("brands")]
+        public async Task<IActionResult> GetBrands()
+        {
+            var brands = await _context.Products
+                .Where(p => !string.IsNullOrEmpty(p.Brand))
+                .Select(p => p.Brand)
+                .Distinct()
+                .OrderBy(b => b)
+                .ToListAsync();
 
+            return Ok(brands);
+        }
 
         [HttpPost("fix-image-urls")]
         public async Task<IActionResult> FixImageUrls()

@@ -164,23 +164,25 @@ namespace MolineMart.API.Controllers
 
         // GET: api/product/search-suggestions?q=iphone
         [HttpGet("search-suggestions")]
-        public async Task<IActionResult> GetSuggestions([FromQuery] string q)
+        public async Task<IActionResult> GetSuggestions([FromQuery] string q, [FromQuery] int limit = 6)
         {
             if (string.IsNullOrWhiteSpace(q))
                 return Ok(new List<string>());
 
-            q = q.ToLower();
+            q = q.Trim().ToLower();
 
             var suggestions = await _context.Products
                 .Where(p => p.Brand.ToLower().Contains(q)
                          || p.Model.ToLower().Contains(q))
+                .OrderBy(p => p.Model)
+                .Take(limit)
                 .Select(p => new
                 {
                     id = p.Id,
                     name = p.Brand + " " + p.Model,
                     image = p.ImageUrl
                 })
-                .Take(10)
+                //.Take(10)
                 .ToListAsync();
 
             return Ok(suggestions);
